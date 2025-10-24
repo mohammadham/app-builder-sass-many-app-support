@@ -19,6 +19,10 @@ import NewsletterService from "@/views/private/apps/services/newsletter_service/
 import KeyService from "@/views/private/apps/services/key_service/KeyService.vue";
 import SplashscreenAppSettings from "@/views/private/apps/editor/splashscreen_app_settings/SplashscreenAppSettings.vue";
 import TemplateConfig from "@/views/private/apps/editor/template_config/TemplateConfig.vue";
+import AdminLanguagesList from "@/views/admin/languages/AdminLanguagesList.vue";
+import AdminTranslationsEditor from "@/views/admin/languages/AdminTranslationsEditor.vue";
+import AdminTemplatesList from "@/views/admin/templates/AdminTemplatesList.vue";
+import AdminTemplateEditor from "@/views/admin/templates/AdminTemplateEditor.vue";
 import Subscribe from "@/views/private/profile/Subscribe.vue";
 import Transactions from "@/views/private/profile/Transactions.vue";
 import ArchiveTickets from "@/views/private/support/ArchiveTickets.vue";
@@ -378,6 +382,26 @@ const routes = [
         name: 'AdminLicense',
         component: AdminLicense,
         meta: { sidebar: 'settings'}
+      },
+      {
+        path: '/admin/languages',
+        name: 'AdminLanguagesList',
+        component: AdminLanguagesList,
+      },
+      {
+        path: '/admin/translations',
+        name: 'AdminTranslationsEditor',
+        component: AdminTranslationsEditor,
+      },
+      {
+        path: '/admin/templates',
+        name: 'AdminTemplatesList',
+        component: AdminTemplatesList,
+      },
+      {
+        path: '/admin/templates/:uid',
+        name: 'AdminTemplateEditor',
+        component: AdminTemplateEditor,
       },
     ]
   }

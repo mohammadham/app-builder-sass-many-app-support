@@ -82,6 +82,7 @@ use App\Controllers\Api\Customer\Support\CreateTicket;
 use App\Controllers\Api\Customer\Support\TicketDetail;
 use App\Controllers\Api\Customer\Support\TicketsList;
 use App\Controllers\Api\Ipn\Razorpay;
+use App\Controllers\Api\Ipn\ZarinPal as IpnZarinPal;
 use App\Controllers\Api\Ipn\YooKassa;
 use App\Controllers\Api\Manager\Projects\ProjectsList as AdminProjectsList;
 use App\Controllers\Api\Manager\Projects\ProjectsUserList as AdminProjectsUserList;
@@ -162,6 +163,8 @@ use App\Controllers\Api\Manager\Settings\EmailSettings as AdminEmailSettings;
 use App\Controllers\Api\Manager\Settings\UpdateEmailSettings as AdminUpdateEmailSettings;
 use App\Controllers\Api\Manager\Settings\LicenseSettings as AdminLicenseSettings;
 use App\Controllers\Api\Manager\Settings\ActivateLicense as AdminActivateLicense;
+use App\Controllers\Api\Manager\Settings\ZarinPalSettings as AdminZarinPalSettings;
+use App\Controllers\Api\Manager\Settings\UpdateZarinPalSettings as AdminUpdateZarinPalSettings;
 use App\Controllers\Api\Manager\Dashboard\TotalStat as AdminTotalStat;
 use App\Controllers\Api\Manager\Dashboard\ChartStat as AdminChartStat;
 use App\Controllers\Api\Manager\Templates\TemplatesList as AdminTemplatesList;
@@ -172,8 +175,14 @@ use App\Controllers\Api\Manager\Templates\DeleteTemplate as AdminDeleteTemplate;
 use App\Controllers\Api\Manager\Templates\UpdateFormSchema as AdminUpdateFormSchema;
 use App\Controllers\Api\Manager\Templates\UploadThumbnail as AdminUploadThumbnail;
 use App\Controllers\Api\Manager\Templates\CategoriesList as AdminCategoriesList;
+use App\Controllers\Api\Manager\Languages\LanguagesList as AdminLanguagesList;
+use App\Controllers\Api\Manager\Languages\UpdateLanguage as AdminUpdateLanguage;
+use App\Controllers\Api\Manager\Languages\TranslationsList as AdminTranslationsList;
+use App\Controllers\Api\Manager\Languages\UpdateTranslation as AdminUpdateTranslation;
+use App\Controllers\Api\Manager\Languages\BulkUpdateTranslations as AdminBulkUpdateTranslations;
 use App\Controllers\Api\Data\Icons;
 use App\Controllers\Api\Data\Templates as DataTemplates;
+use App\Controllers\Api\Data\Translations as DataTranslations;
 use App\Controllers\Api\Data\Iso;
 use App\Controllers\Api\Ipn\Stripe;
 use App\Controllers\Api\Observe;
@@ -222,6 +231,8 @@ $routes->group("public", static function ($routes) {
     $routes->get("data/templates",      [DataTemplates::class, "index"], []);
     $routes->get("data/templates/(:segment)", [DataTemplates::class, "detail"], []);
     $routes->get("data/categories",     [DataTemplates::class, "categories"], []);
+    $routes->get("data/translations",   [DataTranslations::class, "index"], []);
+    $routes->get("data/languages",      [DataTranslations::class, "languages"], []);
     // Auth
     $routes->post("auth/login",         [Login::class, "index"], []);
     $routes->post("auth/sign_up",       [Registration::class, "index"], []);
@@ -237,6 +248,7 @@ $routes->group("public", static function ($routes) {
     // Ipn
     $routes->post("ipn/stripe",         [Stripe::class, "index"], []);
     $routes->post("ipn/razorpay",       [Razorpay::class, "index"], []);
+    $routes->get("ipn/zarinpal",        [IpnZarinPal::class, "index"], []);
     $routes->post("ipn/yookassa",       [YooKassa::class, "index"], []);
     $routes->post("ipn/yookassa/check", [YooKassa::class, "payment"], []);
 });
@@ -448,6 +460,8 @@ $routes->group("admin", ["filter" => "admin"], static function ($routes) {
     $routes->post("settings/update_email",                      [AdminUpdateEmailSettings::class, "index"], []);
     $routes->get("settings/license",                            [AdminLicenseSettings::class, "index"], []);
     $routes->post("settings/license_activation",                [AdminActivateLicense::class, "index"], []);
+    $routes->get("settings/zarinpal",                           [AdminZarinPalSettings::class, "index"], []);
+    $routes->post("settings/zarinpal",                          [AdminUpdateZarinPalSettings::class, "index"], []);
     // Dashboard
     $routes->get("dashboard/total",                             [AdminTotalStat::class, "index"], []);
     $routes->get("dashboard/chart",                             [AdminChartStat::class, "index"], []);
@@ -460,4 +474,10 @@ $routes->group("admin", ["filter" => "admin"], static function ($routes) {
     $routes->post("templates/update_schema",                    [AdminUpdateFormSchema::class, "index"], []);
     $routes->post("templates/upload_thumbnail",                 [AdminUploadThumbnail::class, "index"], []);
     $routes->get("templates/categories",                        [AdminCategoriesList::class, "index"], []);
+    // Languages & Translations Management
+    $routes->get("languages/list",                              [AdminLanguagesList::class, "index"], []);
+    $routes->post("languages/update",                           [AdminUpdateLanguage::class, "index"], []);
+    $routes->get("translations/list",                           [AdminTranslationsList::class, "index"], []);
+    $routes->post("translations/update",                        [AdminUpdateTranslation::class, "index"], []);
+    $routes->post("translations/bulk_update",                   [AdminBulkUpdateTranslations::class, "index"], []);
 });

@@ -15,7 +15,10 @@
         :to="item.to"
       >
         <template v-slot:prepend>
-          <component :is="item.icon" size="22" class="mr-3 text-primary"/>
+          <v-icon v-if="typeof item.icon === 'string'" size="22" class="mr-3 text-primary">
+            {{ item.icon }}
+          </v-icon>
+          <component v-else :is="item.icon" size="22" class="mr-3 text-primary"/>
         </template>
         <v-list-item-title class="text-body-1 font-weight-regular line" style="line-height: 1.2rem;">
           {{ $tr('admin', item.name) }}
@@ -34,6 +37,7 @@ import MoneyTransferIcon from "@/components/icons/MoneyTransferIcon.vue";
 import TagIcon from "@/components/icons/TagIcon.vue";
 import CreditCardIcon from "@/components/icons/CreditCardIcon.vue";
 import GearIcon from "@/components/icons/GearIcon.vue";
+import AppsIcon from "@/components/icons/AppsIcon.vue";
 
 export default {
   name: 'AdminSidebar',
@@ -73,6 +77,16 @@ export default {
         name: "key_94",
         to: "/admin/providers",
         icon: CreditCardIcon
+      },
+      {
+        name: "key_templates_management",
+        to: "/admin/templates",
+        icon: AppsIcon
+      },
+      {
+        name: "key_languages_management",
+        to: "/admin/languages",
+        icon: 'mdi-translate'
       },
       {
         name: "key_6",

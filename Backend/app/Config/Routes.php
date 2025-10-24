@@ -27,6 +27,8 @@ use App\Controllers\Api\Customer\Projects\Builds\CreateBuild;
 use App\Controllers\Api\Customer\Projects\Builds\DownloadArtefact;
 use App\Controllers\Api\Customer\Projects\CreateProject;
 use App\Controllers\Api\Customer\Projects\DeleteProject;
+use App\Controllers\Api\Customer\Projects\SaveConfig;
+use App\Controllers\Api\Customer\Projects\GetConfig;
 use App\Controllers\Api\Customer\Projects\Design\CreateStyleDiv;
 use App\Controllers\Api\Customer\Projects\Design\DrawerSettings;
 use App\Controllers\Api\Customer\Projects\Design\RemoveStyleDiv;
@@ -275,6 +277,8 @@ $routes->group("private", ["filter" => "private"], static function ($routes) {
     $routes->get("projects/detail",                             [ProjectDetail::class, "index"], []);
     $routes->post("projects/create",                            [CreateProject::class, "index"], []);
     $routes->post("projects/remove",                            [DeleteProject::class, "index"], []);
+    $routes->get("projects/config",                             [GetConfig::class, "index"], []);
+    $routes->post("projects/config/save",                       [SaveConfig::class, "index"], []);
     // Project settings
     $routes->get("projects/settings/main",                      [AppSettings::class, "index"], []);
     $routes->post("projects/settings/update_main",              [UpdateAppSettings::class, "index"], []);

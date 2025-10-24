@@ -27,12 +27,14 @@
             :autofocus="true"
             density="comfortable"
             v-model="name"
+            data-testid="create-project-name"
           ></v-text-field>
           <v-text-field
             :label="$tr('project', 'key_8')"
             variant="outlined"
             density="comfortable"
             v-model="link"
+            data-testid="create-project-link"
           ></v-text-field>
         </div>
         <div class="w-100 mb-5">
@@ -55,13 +57,30 @@
           <div class="text-caption mb-3">
             {{ $tr('project', 'key_11') }}
           </div>
-          <TemplatePicker :template="template" @change="changeTemplate"/>
+          <TemplatePicker 
+            :template="template" 
+            :template-id="templateId"
+            @change="changeTemplate"
+            @change-id="changeTemplateId"
+            @template-selected="handleTemplateSelected"
+          />
         </div>
         <div class="w-100 d-flex justify-space-between align-center mb-12">
-          <v-btn color="default" variant="flat" @click="$store.commit('switchOpenCreateModal')">
+          <v-btn 
+            color="default" 
+            variant="flat" 
+            @click="$store.commit('switchOpenCreateModal')"
+            data-testid="create-project-cancel"
+          >
             {{ $tr('project', 'key_145') }}
           </v-btn>
-          <v-btn color="primary" variant="flat" :loading="loading" @click="createApp">
+          <v-btn 
+            color="primary" 
+            variant="flat" 
+            :loading="loading" 
+            @click="createApp"
+            data-testid="create-project-submit"
+          >
             {{ $tr('project', 'key_16') }}
           </v-btn>
         </div>
@@ -87,10 +106,9 @@ export default {
     color: "#FFFFFF",
     isDark: true,
     template: 0,
+    templateId: null,
+    selectedTemplate: null
   }),
-  watch: {
-
-  },
   methods: {
     changeSeed(val) {
       this.seed = val;
@@ -101,15 +119,31 @@ export default {
     changeTemplate(val) {
       this.template = val;
     },
+    changeTemplateId(val) {
+      this.templateId = val;
+    },
+    handleTemplateSelected(templateData) {
+      this.selectedTemplate = templateData;
+      this.template = templateData.index;
+      this.templateId = templateData.id;
+    },
     createApp() {
       this.loading = true;
-      projectsService.createProject({
+      
+      const projectData = {
         link: this.link,
         name: this.name,
         template: this.template,
         color: this.seed,
         theme: this.isDark ? 0 : 1
-      }).then((res) => {
+      };
+      
+      // اضافه کردن template_id اگر انتخاب شده باشد
+      if (this.templateId) {
+        projectData.template_id = this.templateId;
+      }
+      
+      projectsService.createProject(projectData).then((res) => {
         const data = res.data;
         this.$router.push({ path: `/private/apps/${data.uid}/main` });
         this.$store.commit('switchOpenCreateModal');
@@ -118,9 +152,6 @@ export default {
         this.loading = false;
       });
     }
-  },
-  beforeMount() {
-
   }
 };
 </script>

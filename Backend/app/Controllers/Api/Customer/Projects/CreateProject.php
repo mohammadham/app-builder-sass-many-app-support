@@ -49,6 +49,14 @@ class CreateProject extends PrivateController
 
         $link = esc($this->request->getJsonVar("link"));
         $template = (int) $this->request->getJsonVar("template");
+        $template_id = (int) $this->request->getJsonVar("template_id");
+
+        // If template_id not provided, use default (template 1 = primary template)
+        if (!$template_id) {
+            $templatesModel = new \App\Models\TemplatesModel();
+            $primaryTemplate = $templatesModel->where('is_primary', 1)->first();
+            $template_id = $primaryTemplate ? $primaryTemplate['id'] : 1;
+        }
 
         $apps = new AppsModel();
 
@@ -61,6 +69,7 @@ class CreateProject extends PrivateController
             "color_theme"   => $color,
             "color_title"   => (int) $this->request->getJsonVar("theme"),
             "template"      => $template,
+            "template_id"   => $template_id,
             "email"         => $user["email"],
             "language"      => strtoupper($this->request->getLocale()),
             "loader_color"  => $color,

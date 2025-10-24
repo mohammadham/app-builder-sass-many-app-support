@@ -18,6 +18,7 @@ import BuildService from "@/views/private/apps/services/build_service/BuildServi
 import NewsletterService from "@/views/private/apps/services/newsletter_service/NewsletterService.vue";
 import KeyService from "@/views/private/apps/services/key_service/KeyService.vue";
 import SplashscreenAppSettings from "@/views/private/apps/editor/splashscreen_app_settings/SplashscreenAppSettings.vue";
+import TemplateConfig from "@/views/private/apps/editor/template_config/TemplateConfig.vue";
 import Subscribe from "@/views/private/profile/Subscribe.vue";
 import Transactions from "@/views/private/profile/Transactions.vue";
 import ArchiveTickets from "@/views/private/support/ArchiveTickets.vue";
@@ -134,6 +135,12 @@ const routes = [
         path: '/private/apps/:uid/splashscreen',
         name: 'SplashscreenAppSettings',
         component: SplashscreenAppSettings,
+        meta: { sidebar: 'editor'}
+      },
+      {
+        path: '/private/apps/:uid/template-config',
+        name: 'TemplateConfig',
+        component: TemplateConfig,
         meta: { sidebar: 'editor'}
       },
       {

@@ -94,6 +94,7 @@ import CheckDeviceIcon from "@/components/icons/CheckDeviceIcon.vue";
 import PushIcon from "@/components/icons/PushIcon.vue";
 import KeySquareIcon from "@/components/icons/KeySquareIcon.vue";
 import LockIcon from "@/components/icons/LockIcon.vue";
+import FragmentIcon from "@/components/icons/FragmentIcon.vue";
 import CrownIcon from "@/components/icons/CrownIcon.vue";
 import SquircleImage from "@/components/blocks/SquircleImage.vue";
 import projectsService from "@/services/projects/projects.service";
@@ -144,6 +145,11 @@ export default {
         name: "key_43",
         to: "assets",
         icon: ImageIcon
+      },
+      {
+        name: "key_template_config",
+        to: "template-config",
+        icon: FragmentIcon
       },
     ],
     services: [

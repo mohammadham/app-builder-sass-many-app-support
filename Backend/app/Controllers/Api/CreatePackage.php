@@ -5,7 +5,10 @@ use App\Controllers\BaseController;
 use App\Libraries\CodeMagic;
 use App\Libraries\GitHub;
 use App\Libraries\OneSignal;
+use App\Libraries\ConfigGenerator;
 use App\Models\AppsModel;
+use App\Models\AppConfigsModel;
+use App\Models\TemplatesModel;
 use App\Models\BuildsModel;
 use App\Models\LocalsModel;
 use App\Models\SignsAndroidModel;
@@ -729,32 +732,22 @@ class CreatePackage extends BaseController
             return ["event" => false, "message" => lang("Message.message_14")];
         }
 
-        $onesignal_id = "";
-
-        if ($platform == "android") {
-
-            if ($app["one_signal_id"]) {
-                $onesignal_id = $app["one_signal_id"];
-            } else {
-                $onesignal = new OneSignal();
-                $resOs = $onesignal->create_onesignal_app($app["uid"]);
-                if (!$resOs["event"]) {
-                    return $resOs;
-                }
-                $onesignal_id = $resOs["app_id"];
-                $projects->update($app["id"], [
-                    "one_signal_id" => $resOs["app_id"]
-                ]);
+        // Check if app uses new template system
+        $useNewSystem = isset($app["template_id"]) && $app["template_id"] > 0;
+        
+        if ($useNewSystem) {
+            // Use new config generation system
+            $result = $this->upload_config_new_system($app, $appId, $version, $platform);
+            if (!$result["event"]) {
+                return $result;
             }
         }
-
+        
+        // Upload static assets (common for both systems)
         $git = new GitHub();
-
+        
         $splash_screens = new SplashScreensModel();
-
-        $splash = $splash_screens
-            ->where("app_id", $app["id"])
-            ->first();
+        $splash = $splash_screens->where("app_id", $app["id"])->first();
 
         if ($splash["image"]) {
             $splash_content = file_get_contents(ROOTPATH.'public_html/upload/splash/'.$app['uid'].'/'.$splash["image"]);
@@ -773,10 +766,7 @@ class CreatePackage extends BaseController
         }
 
         $locals = new LocalsModel();
-
-        $local = $locals
-            ->where("app_id", $app["id"])
-            ->first();
+        $local = $locals->where("app_id", $app["id"])->first();
 
         if ($local["offline_image"]) {
             $off_content = file_get_contents(ROOTPATH.'public_html/upload/info/'.$app['uid'].'/'.$local["offline_image"]);
@@ -786,49 +776,131 @@ class CreatePackage extends BaseController
             }
         }
 
-        $configFile = file_get_contents(WRITEPATH.'bundle/config.dart');
+        // If using old system, generate config.dart in old format
+        if (!$useNewSystem) {
+            $onesignal_id = "";
 
-        $configFileVariables = [
-            "{GENERATE_DATE}",
-            "{APP_UID}",
-            "{API_SERVER}",
-            "{VERSION}",
-            "{ONESIGNAL_PUSH_ID}",
-            "{SPLASH_BACKGROUND_COLOR}",
-            "{SPLASH_TEXT_COLOR}",
-            "{SPLASH_IS_BACKGROUND_IMAGE}",
-            "{SPLASH_BACKGROUND_IMAGE}",
-            "{SPLASH_TAGLINE}",
-            "{SPLASH_DELAY}",
-            "{SPLASH_LOGO_IMAGE}",
-            "{SPLASH_IS_DISPLAY_LOGO}",
-            "{OFFLINE_ERROR_MESSAGE}",
-            "{OFFLINE_IMAGE}",
-            "{SUBSCRIBE_ERROR_TITLE}",
-            "{SUBSCRIBE_ERROR_MESSAGE}"
-        ];
-        $configCodeVariable = [
-            date('d-m-Y H:i'),
+            if ($platform == "android") {
+                if ($app["one_signal_id"]) {
+                    $onesignal_id = $app["one_signal_id"];
+                } else {
+                    $onesignal = new OneSignal();
+                    $resOs = $onesignal->create_onesignal_app($app["uid"]);
+                    if (!$resOs["event"]) {
+                        return $resOs;
+                    }
+                    $onesignal_id = $resOs["app_id"];
+                    $projects->update($app["id"], [
+                        "one_signal_id" => $resOs["app_id"]
+                    ]);
+                }
+            }
+
+            $configFile = file_get_contents(WRITEPATH.'bundle/config.dart');
+
+            $configFileVariables = [
+                "{GENERATE_DATE}",
+                "{APP_UID}",
+                "{API_SERVER}",
+                "{VERSION}",
+                "{ONESIGNAL_PUSH_ID}",
+                "{SPLASH_BACKGROUND_COLOR}",
+                "{SPLASH_TEXT_COLOR}",
+                "{SPLASH_IS_BACKGROUND_IMAGE}",
+                "{SPLASH_BACKGROUND_IMAGE}",
+                "{SPLASH_TAGLINE}",
+                "{SPLASH_DELAY}",
+                "{SPLASH_LOGO_IMAGE}",
+                "{SPLASH_IS_DISPLAY_LOGO}",
+                "{OFFLINE_ERROR_MESSAGE}",
+                "{OFFLINE_IMAGE}",
+                "{SUBSCRIBE_ERROR_TITLE}",
+                "{SUBSCRIBE_ERROR_MESSAGE}"
+            ];
+            $configCodeVariable = [
+                date('d-m-Y H:i'),
+                $app["uid"],
+                site_url(),
+                $version,
+                $onesignal_id,
+                $splash["color"],
+                !$splash["theme"] ? "#ffffff" : "#000000",
+                !$splash["background"] ? "false" : "true",
+                "splash_screen.png",
+                $splash["tagline"],
+                $splash["delay"],
+                "splash_logo.png",
+                !$splash["use_logo"] ? "false" : "true",
+                $local["string_5"],
+                "dino.png",
+                lang("Message.message_76"),
+                lang("Message.message_77"),
+            ];
+            $content = str_replace($configFileVariables, $configCodeVariable, $configFile);
+
+            return $git->create_commit($app["uid"], "lib/config/config.dart", $content);
+        }
+        
+        return ["event" => true];
+    }
+
+    /**
+     * Upload config using new template system
+     * @param array $app
+     * @param int $appId
+     * @param string $version
+     * @param string $platform
+     * @return array
+     */
+    private function upload_config_new_system(array $app, int $appId, string $version, string $platform): array
+    {
+        // Get template
+        $templatesModel = new TemplatesModel();
+        $template = $templatesModel->find($app["template_id"]);
+        
+        if (!$template) {
+            return ["event" => false, "message" => "Template not found"];
+        }
+
+        // Get app config
+        $configModel = new AppConfigsModel();
+        $appConfig = $configModel->getByAppId($appId);
+        
+        $configData = [];
+        if ($appConfig) {
+            $configData = json_decode($appConfig["config_data"], true) ?: [];
+        }
+
+        // Generate config file using ConfigGenerator
+        $generator = new ConfigGenerator();
+        $configResult = $generator->generate(
+            $template,
+            $configData,
+            [
+                'uid' => $app['uid'],
+                'name' => $app['name'],
+                'version' => $version,
+                'platform' => $platform
+            ]
+        );
+
+        if (!$configResult['event']) {
+            return $configResult;
+        }
+
+        // If template uses existing method (primary template), skip
+        if (isset($configResult['use_existing_method']) && $configResult['use_existing_method']) {
+            return ["event" => true];
+        }
+
+        // Upload generated config to GitHub
+        $git = new GitHub();
+        return $git->create_commit(
             $app["uid"],
-            site_url(),
-            $version,
-            $onesignal_id,
-            $splash["color"],
-            !$splash["theme"] ? "#ffffff" : "#000000",
-            !$splash["background"] ? "false" : "true",
-            "splash_screen.png",
-            $splash["tagline"],
-            $splash["delay"],
-            "splash_logo.png",
-            !$splash["use_logo"] ? "false" : "true",
-            $local["string_5"],
-            "dino.png",
-            lang("Message.message_76"),
-            lang("Message.message_77"),
-        ];
-        $content = str_replace($configFileVariables, $configCodeVariable, $configFile);
-
-        return $git->create_commit($app["uid"], "lib/config/config.dart", $content);
+            $configResult['path'],
+            $configResult['content']
+        );
+    }
     }
 
     /**

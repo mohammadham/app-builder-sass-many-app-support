@@ -162,7 +162,16 @@ use App\Controllers\Api\Manager\Settings\LicenseSettings as AdminLicenseSettings
 use App\Controllers\Api\Manager\Settings\ActivateLicense as AdminActivateLicense;
 use App\Controllers\Api\Manager\Dashboard\TotalStat as AdminTotalStat;
 use App\Controllers\Api\Manager\Dashboard\ChartStat as AdminChartStat;
+use App\Controllers\Api\Manager\Templates\TemplatesList as AdminTemplatesList;
+use App\Controllers\Api\Manager\Templates\TemplateDetail as AdminTemplateDetail;
+use App\Controllers\Api\Manager\Templates\CreateTemplate as AdminCreateTemplate;
+use App\Controllers\Api\Manager\Templates\UpdateTemplate as AdminUpdateTemplate;
+use App\Controllers\Api\Manager\Templates\DeleteTemplate as AdminDeleteTemplate;
+use App\Controllers\Api\Manager\Templates\UpdateFormSchema as AdminUpdateFormSchema;
+use App\Controllers\Api\Manager\Templates\UploadThumbnail as AdminUploadThumbnail;
+use App\Controllers\Api\Manager\Templates\CategoriesList as AdminCategoriesList;
 use App\Controllers\Api\Data\Icons;
+use App\Controllers\Api\Data\Templates as DataTemplates;
 use App\Controllers\Api\Data\Iso;
 use App\Controllers\Api\Ipn\Stripe;
 use App\Controllers\Api\Observe;
@@ -208,6 +217,9 @@ $routes->group("public", static function ($routes) {
     // Data
     $routes->get("data/iso",            [Iso::class, "index"], []);
     $routes->get("data/icons",          [Icons::class, "index"], []);
+    $routes->get("data/templates",      [DataTemplates::class, "index"], []);
+    $routes->get("data/templates/(:segment)", [DataTemplates::class, "detail"], []);
+    $routes->get("data/categories",     [DataTemplates::class, "categories"], []);
     // Auth
     $routes->post("auth/login",         [Login::class, "index"], []);
     $routes->post("auth/sign_up",       [Registration::class, "index"], []);
@@ -435,4 +447,13 @@ $routes->group("admin", ["filter" => "admin"], static function ($routes) {
     // Dashboard
     $routes->get("dashboard/total",                             [AdminTotalStat::class, "index"], []);
     $routes->get("dashboard/chart",                             [AdminChartStat::class, "index"], []);
+    // Templates Management
+    $routes->get("templates/list",                              [AdminTemplatesList::class, "index"], []);
+    $routes->get("templates/detail",                            [AdminTemplateDetail::class, "index"], []);
+    $routes->post("templates/create",                           [AdminCreateTemplate::class, "index"], []);
+    $routes->post("templates/update",                           [AdminUpdateTemplate::class, "index"], []);
+    $routes->post("templates/delete",                           [AdminDeleteTemplate::class, "index"], []);
+    $routes->post("templates/update_schema",                    [AdminUpdateFormSchema::class, "index"], []);
+    $routes->post("templates/upload_thumbnail",                 [AdminUploadThumbnail::class, "index"], []);
+    $routes->get("templates/categories",                        [AdminCategoriesList::class, "index"], []);
 });

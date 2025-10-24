@@ -17,6 +17,7 @@ class AppsModel extends Model
         'color_theme',
         'color_title',
         'template',
+        'template_id',
         'app_id',
         'user_agent',
         'orientation',

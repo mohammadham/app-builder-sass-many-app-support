@@ -5,7 +5,6 @@ use Config\Services;
 class Flangapp
 {
     private ?string $licenseKey;
-    private string $apiUrl;
 
     /**
      * Create models, config and library's
@@ -14,7 +13,6 @@ class Flangapp
     {
         $settings = new Settings();
         $this->licenseKey = $settings->get_config("license");
-        $this->apiUrl = "https://builder.flangapp.com/";
     }
 
     /**************************************************************************************
@@ -22,58 +20,34 @@ class Flangapp
      **************************************************************************************/
 
     /**
-     * License activation
+     * License activation (Bypass external API call)
      * @param string $code
      * @return array
      */
     public function activation_license(string $code): array
     {
-        $res = Services::curlrequest([
-            "baseURI"     => $this->apiUrl,
-            "headers"     => [
-                "Content-Type" => "application/json",
-                "User-Agent"   => base_url()
-            ],
-            "http_errors" => false,
-        ])->setJSON(["code" => $code])->post("public/license/activation");
-
-        $data =  json_decode($res->getBody());
-
-        if ($res->getStatusCode() != 200) {
-            return [
-                "event"   => false,
-                "message" => !empty($data->message) ? $data->message : lang("Message.message_90")
-            ];
+        // Bypass external API, just validate locally if needed
+        if ($code === 'Megaeducate@555') {
+            return ["event" => true];
         }
 
-        return ["event" => true];
+        return [
+            "event" => false,
+            "message" => "Invalid license code."
+        ];
     }
 
     /**
-     * Get snack project preview files
+     * Get snack project preview files (bypass API call)
      * @return array
      */
     public function get_snacks(): array
     {
-        $res = Services::curlrequest([
-            "baseURI"     => $this->apiUrl,
-            "headers"     => [
-                "Content-Type"   => "application/json",
-                "Authorization"  => $this->licenseKey
-            ],
-            "http_errors" => false,
-        ])->post("private/preview/snack");
-
-        $data =  json_decode($res->getBody());
-
-        if ($res->getStatusCode() != 200) {
-            return [
-                "event"   => false,
-                "message" => !empty($data->message) ? $data->message : lang("Message.message_82")
-            ];
-        }
-
-        return ["event" => true, "data" => $data];
+        // Mock data or return empty as bypass
+        return [
+            "event" => true,
+            "data" => [] // Replace with actual local data if needed
+        ];
     }
 
     /**
@@ -86,65 +60,32 @@ class Flangapp
     {
         helper('text');
 
-        $res = Services::curlrequest([
-            "baseURI"     => $this->apiUrl,
-            "headers"     => [
-                "Content-Type"   => "application/json",
-                "Authorization"  => $this->licenseKey
-            ],
-            "http_errors" => false,
-        ])->setJSON([
-            "alias" => $alias,
-            "password" => $password
-        ])->post("private/signature/android");
+        // Mock the process of creating a keystore file
+        $name = random_string("alpha", 10) . ".jks";
+        $filePath = WRITEPATH . 'storage/android/' . $name;
 
-        if ($res->getStatusCode() != 200) {
-            $data =  json_decode($res->getBody());
-            return [
-                "event"   => false,
-                "message" => !empty($data->message) ? $data->message : lang("Message.message_70")
-            ];
-        }
-
-        $name = random_string("alpha", 10).".jks";
-
-        $fp = fopen(WRITEPATH.'storage/android/'.$name,"wb");
-        fwrite($fp, $res->getBody());
-        fclose($fp);
+        // You can generate a mock content or simply create a blank file
+        $content = "Mock keystore content for alias: $alias";
+        file_put_contents($filePath, $content);
 
         return ["event" => true, "name" => $name];
     }
 
     /**
-     * Create .pem file for ios signature
+     * Create .pem file for ios signature (bypass API call)
      * @return array
      */
     public function create_pem(): array
     {
         helper('text');
 
-        $res = Services::curlrequest([
-            "baseURI"     => $this->apiUrl,
-            "headers"     => [
-                "Content-Type"   => "application/json",
-                "Authorization"  => $this->licenseKey
-            ],
-            "http_errors" => false,
-        ])->post("private/signature/pem");
+        // Mock the process of creating a PEM file
+        $name = random_string("alpha", 10) . ".pem";
+        $filePath = WRITEPATH . 'storage/pub/' . $name;
 
-        if ($res->getStatusCode() != 200) {
-            $data =  json_decode($res->getBody());
-            return [
-                "event"   => false,
-                "message" => !empty($data->message) ? $data->message : lang("Message.message_70")
-            ];
-        }
-
-        $name = random_string("alpha", 10);
-
-        $fp = fopen(WRITEPATH.'storage/pub/'.$name,"wb");
-        fwrite($fp, $res->getBody());
-        fclose($fp);
+        // Generate mock content or leave it blank
+        $content = "Mock PEM content";
+        file_put_contents($filePath, $content);
 
         return ["event" => true, "name" => $name];
     }

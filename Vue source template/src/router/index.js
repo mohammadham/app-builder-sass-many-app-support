@@ -62,8 +62,17 @@ import AdminApiSettings from "@/views/admin/settings/AdminApiSettings.vue";
 import AdminPushSettings from "@/views/admin/settings/AdminPushSettings.vue";
 import AdminEmailSettings from "@/views/admin/settings/AdminEmailSettings.vue";
 import AdminLicense from "@/views/admin/settings/AdminLicense.vue";
+import AdminZarinPalSettings from "@/views/admin/settings/AdminZarinPalSettings.vue";
+import AdminEnamadSettings from "@/views/admin/settings/AdminEnamadSettings.vue";
+import AdminLandingSettings from "@/views/admin/settings/AdminLandingSettings.vue";
+import TemplatesGallery from "@/views/public/TemplatesGallery.vue";
 
 const routes = [
+  {
+    path: '/templates',
+    name: 'TemplatesGallery',
+    component: TemplatesGallery,
+  },
   {
     path: "/",
     component: AuthLayout,
@@ -381,6 +390,24 @@ const routes = [
         path: '/admin/settings/license',
         name: 'AdminLicense',
         component: AdminLicense,
+        meta: { sidebar: 'settings'}
+      },
+      {
+        path: '/admin/settings/zarinpal',
+        name: 'AdminZarinPalSettings',
+        component: AdminZarinPalSettings,
+        meta: { sidebar: 'settings'}
+      },
+      {
+        path: '/admin/settings/enamad',
+        name: 'AdminEnamadSettings',
+        component: AdminEnamadSettings,
+        meta: { sidebar: 'settings'}
+      },
+      {
+        path: '/admin/settings/landing',
+        name: 'AdminLandingSettings',
+        component: AdminLandingSettings,
         meta: { sidebar: 'settings'}
       },
       {

@@ -17,6 +17,7 @@ use App\Controllers\Api\Customer\Payment\Razorpay\CreatePaymentRequest as RazorC
 use App\Controllers\Api\Customer\Payment\Razorpay\CancelSubscribe as RazorCancelSubscribe;
 use App\Controllers\Api\Customer\Payment\YooKassa\CreatePaymentRequest as YooKassaCreatePaymentRequest;
 use App\Controllers\Api\Customer\Payment\YooKassa\CancelSubscribe as YooKassaCancelSubscribe;
+use App\Controllers\Api\Customer\Payment\ZarinPal\CreatePaymentRequest as ZarinPalCreatePaymentRequest;
 use App\Controllers\Api\Customer\Plans\PlansList;
 use App\Controllers\Api\Customer\Profile\ProfileDetail;
 use App\Controllers\Api\Customer\Profile\Subscribe\Subscribes;
@@ -165,6 +166,10 @@ use App\Controllers\Api\Manager\Settings\LicenseSettings as AdminLicenseSettings
 use App\Controllers\Api\Manager\Settings\ActivateLicense as AdminActivateLicense;
 use App\Controllers\Api\Manager\Settings\ZarinPalSettings as AdminZarinPalSettings;
 use App\Controllers\Api\Manager\Settings\UpdateZarinPalSettings as AdminUpdateZarinPalSettings;
+use App\Controllers\Api\Manager\Settings\EnamadSettings as AdminEnamadSettings;
+use App\Controllers\Api\Manager\Settings\UpdateEnamadSettings as AdminUpdateEnamadSettings;
+use App\Controllers\Api\Manager\Settings\LandingSettings as AdminLandingSettings;
+use App\Controllers\Api\Manager\Settings\UpdateLandingSettings as AdminUpdateLandingSettings;
 use App\Controllers\Api\Manager\Dashboard\TotalStat as AdminTotalStat;
 use App\Controllers\Api\Manager\Dashboard\ChartStat as AdminChartStat;
 use App\Controllers\Api\Manager\Templates\TemplatesList as AdminTemplatesList;
@@ -183,6 +188,7 @@ use App\Controllers\Api\Manager\Languages\BulkUpdateTranslations as AdminBulkUpd
 use App\Controllers\Api\Data\Icons;
 use App\Controllers\Api\Data\Templates as DataTemplates;
 use App\Controllers\Api\Data\Translations as DataTranslations;
+use App\Controllers\Api\Data\SiteSettings as DataSiteSettings;
 use App\Controllers\Api\Data\Iso;
 use App\Controllers\Api\Ipn\Stripe;
 use App\Controllers\Api\Observe;
@@ -233,6 +239,7 @@ $routes->group("public", static function ($routes) {
     $routes->get("data/categories",     [DataTemplates::class, "categories"], []);
     $routes->get("data/translations",   [DataTranslations::class, "index"], []);
     $routes->get("data/languages",      [DataTranslations::class, "languages"], []);
+    $routes->get("data/site_settings",  [DataSiteSettings::class, "index"], []);
     // Auth
     $routes->post("auth/login",         [Login::class, "index"], []);
     $routes->post("auth/sign_up",       [Registration::class, "index"], []);
@@ -277,6 +284,7 @@ $routes->group("private", ["filter" => "private"], static function ($routes) {
     $routes->post("cancel/razorpay",                            [RazorCancelSubscribe::class, "index"], []);
     $routes->post("payment/yookassa",                           [YooKassaCreatePaymentRequest::class, "index"], []);
     $routes->post("cancel/yookassa",                            [YooKassaCancelSubscribe::class, "index"], []);
+    $routes->post("payment/zarinpal",                           [ZarinPalCreatePaymentRequest::class, "index"], []);
     // Support
     $routes->get("support/tickets",                             [TicketsList::class, "index"], []);
     $routes->get("support/ticket",                              [TicketDetail::class, "index"], []);
@@ -462,6 +470,10 @@ $routes->group("admin", ["filter" => "admin"], static function ($routes) {
     $routes->post("settings/license_activation",                [AdminActivateLicense::class, "index"], []);
     $routes->get("settings/zarinpal",                           [AdminZarinPalSettings::class, "index"], []);
     $routes->post("settings/zarinpal",                          [AdminUpdateZarinPalSettings::class, "index"], []);
+    $routes->get("settings/enamad",                             [AdminEnamadSettings::class, "index"], []);
+    $routes->post("settings/enamad",                            [AdminUpdateEnamadSettings::class, "index"], []);
+    $routes->get("settings/landing",                            [AdminLandingSettings::class, "index"], []);
+    $routes->post("settings/landing",                           [AdminUpdateLandingSettings::class, "index"], []);
     // Dashboard
     $routes->get("dashboard/total",                             [AdminTotalStat::class, "index"], []);
     $routes->get("dashboard/chart",                             [AdminChartStat::class, "index"], []);

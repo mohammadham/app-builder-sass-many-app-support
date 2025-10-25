@@ -8,13 +8,18 @@ import router from "@/router";
 import store from "@/store";
 import {getLocalValue} from "@/lib/local";
 import  "./assets/css/app.css";
+import i18n, { setupI18n } from '@/plugins/i18n';
 
-const app = createApp(App)
-  .use(router)
-  .use(store);
+// Setup i18n and mount app
+setupI18n().then(() => {
+  const app = createApp(App)
+    .use(router)
+    .use(store)
+    .use(i18n);
 
-app.config.globalProperties.$tr = getLocalValue;
+  app.config.globalProperties.$tr = getLocalValue;
 
-registerPlugins(app);
+  registerPlugins(app);
 
-app.mount('#app');
+  app.mount('#app');
+});

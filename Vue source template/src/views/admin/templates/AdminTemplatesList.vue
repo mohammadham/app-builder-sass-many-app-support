@@ -176,9 +176,9 @@
 </template>
 
 <script>
-import PageBar from "@/components/PageBar.vue";
-import PageLoading from "@/components/PageLoading.vue";
-import Placeholder from "@/components/Placeholder.vue";
+import PageBar from "@/components/blocks/PageBar.vue";
+import PageLoading from "@/components/blocks/PageLoading.vue";
+import Placeholder from "@/components/blocks/Placeholder.vue";
 import axios from "axios";
 
 export default {

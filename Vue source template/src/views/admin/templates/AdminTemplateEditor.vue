@@ -118,8 +118,8 @@
 </template>
 
 <script>
-import PageBar from "@/components/PageBar.vue";
-import PageLoading from "@/components/PageLoading.vue";
+import PageBar from "@/components/blocks/PageBar.vue";
+import PageLoading from "@/components/blocks/PageLoading.vue";
 import DynamicFormBuilder from "@/components/admin/DynamicFormBuilder.vue";
 import axios from "axios";
 
